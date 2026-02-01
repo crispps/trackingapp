@@ -1,0 +1,52 @@
+This is a plan of how my development for trackingapp will go. The list of these features are in order 
+of priority to get done. The base level features will be developed and possibly improved upon to impove 
+efficiency in a later date. once all base level features are developed stuff like a GUI for an app and 
+estimates for maxes can be done. But most important is to get a working trackingapp that can store data
+of lifts within a file for future potential features
+
+
+BASE LEVEL FEATURES
+-Login system 
+-lift selection
+-submit lift data
+-lift history
+-data visualisation
+
+POTENTIAL FEATURES
+-export data
+-import data
+-GUI  
+-Lift estimation
+
+
+Desciption of features
+-Login system
+User will login using username so that lift data inputted will be stored under their username
+
+-lift selection
+User will be able to create new lift/movement patterns that data can be added to 
+
+-submit lift data
+User can select a lift and submit data on that lift. The data will be timestamped using 
+current date of manual input of the date the lift was performed
+
+-lift history
+User can see previous lifts for each movement pattern that exists
+
+-data visualisation
+Similar to lift history the user can select a movement pattern and the program will display 
+a graph using data of that lift. Aswell as graphs of progression is multiple lifts
+
+-export data
+Users will be able to export data to a csv file in a readable fashion 
+
+-import data
+Users can import data quickly and easily by importing an excel sheet containing lifting data
+
+-GUI
+User will be able to interact with the program via a Graphical user interface either via an app
+or html
+
+-lift estimation
+Program will create estimations of lifts the user can perform by using previous data. External factors
+like fatigue level could be also taken into an account
