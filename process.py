@@ -1,32 +1,47 @@
 import json
-import tui as ui
+import tui
+from user import User
 
 user: str
 
 
-def signup(path) -> bool:
-    with open(path, "r") as f:
+# returns bool if login already exists
+def check_login(username: str) -> bool:
+    with open("users.json", "r") as f:
+        users = json.load(f)
+    for i in users:
+        if username == i:
+            return True
+    return False
+
+
+def login() -> bool:
+    global user
+    logged_in = False
+    username = ""
+    while not logged_in:
+        username = tui.get_username()
+        logged_in = check_login(username)
+        if not logged_in:
+            tui.login_failed()
+    user = User(username)
+
+    return logged_in
+
+
+def create_user() -> None:
+    username_available = False
+    username = ""
+    with open("users.json", "r") as f:
         users = json.load(f)
         f.close()
-    user_created = False
-    while not user_created:
-        username = ui.get_username()
-        if username not in users:
-            users.append(username)
-            with open(path, "w") as f:
-                json.dump(users, f)
-                f.close()
-            user_created = True
-    return user_created
-
-
-def login(path, username) -> bool:
-    logged_in = False
-    with open(path, "r") as f:
-        users = json.load(f)
-    while not logged_in:
-        for user in users:
-            if user == username:
-                logged_in = True
-        return logged_in
-
+    while not username_available:
+        username = tui.get_username()
+        username_available = not check_login(username)
+        if not username_available:
+            tui.username_unavailble()
+    with open("users.json", "w") as f:
+        users.append(username)
+        json.dump(users, f)
+        f.close()
+    tui.user_created()
