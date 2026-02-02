@@ -27,7 +27,7 @@ def titletext(title: str) -> None:
     print("-"*len(title))
 
 
-def main_menu() -> str:
+def start_menu() -> str:
     titletext("Welcome to trackingapp")
     option_selected = False
     choice = ""
@@ -40,3 +40,21 @@ def main_menu() -> str:
         else:
             print("Invalid choice")
     return choice
+
+
+def main_menu() -> str:
+    option_selected = False
+    choice = ""
+    while not option_selected:
+        print("1. Record lift")
+        print("2. View lifts")
+        print("3. Create new lift")
+        choice = input("Enter your choice: ")
+        if choice in ["1", "2", "3"]:
+            option_selected = True
+        else:
+            print("Invalid choice")
+    return choice
+
+
+def get_lift_data() -> tuple:

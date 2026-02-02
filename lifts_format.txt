@@ -1,0 +1,5 @@
+Lift = {
+	"Bench Press": {"chris": [{"Date": "20-20-20",
+							   "Weight": "200",
+							   "Reps": "2",
+							   "RPE": "8"

@@ -7,7 +7,7 @@ user: str
 
 # returns bool if login already exists
 def check_login(username: str) -> bool:
-    with open("users.json", "r") as f:
+    with open("data/users.json", "r") as f:
         users = json.load(f)
     for i in users:
         if username == i:
@@ -32,7 +32,7 @@ def login() -> bool:
 def create_user() -> None:
     username_available = False
     username = ""
-    with open("users.json", "r") as f:
+    with open("data/users.json", "r") as f:
         users = json.load(f)
         f.close()
     while not username_available:
@@ -40,8 +40,11 @@ def create_user() -> None:
         username_available = not check_login(username)
         if not username_available:
             tui.username_unavailble()
-    with open("users.json", "w") as f:
+    with open("data/users.json", "w") as f:
         users.append(username)
         json.dump(users, f)
         f.close()
     tui.user_created()
+
+
+def create_lift() -> None:
