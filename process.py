@@ -2,7 +2,7 @@ import json
 import tui
 from user import User
 
-user: str
+user: object
 
 
 # returns bool if login already exists
@@ -47,4 +47,11 @@ def create_user() -> None:
     tui.user_created()
 
 
-def create_lift() -> None:
+def submit_lift_data() -> None:
+    lift_exists = False
+    while not lift_exists:
+        data = tui.get_lift_data()
+        lift_exists = user.lift_exists(data[0])
+        if not lift_exists:
+            tui.lift_doesnt_exist()
+    user.add_data(data)

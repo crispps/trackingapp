@@ -21,6 +21,10 @@ def username_unavailble() -> None:
     print("Account already exists")
 
 
+def lift_doesnt_exist() -> None:
+    print("Lift doesn't exist")
+
+
 def titletext(title: str) -> None:
     print("-"*len(title))
     print(title)
@@ -58,3 +62,10 @@ def main_menu() -> str:
 
 
 def get_lift_data() -> tuple:
+    lift_name = input("Enter lift name: ")
+    lift_date = input("Enter lift date (YYYY-MM-DD): ")
+    lift_weight = input("Enter lift weight (kg): ")
+    lift_sets = input("Enter lift sets: ")
+    lift_reps = input("Enter lift reps: ")
+    lift_rpe = input("Enter lift RPE: ")
+    return lift_name, lift_date, lift_weight, lift_sets, lift_reps, lift_rpe

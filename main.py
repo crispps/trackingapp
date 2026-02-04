@@ -11,6 +11,8 @@ while not logged_in:
 exit = False
 while not exit:
     choice = tui.main_menu()
+    if choice == "1":
+        pc.submit_lift_data()
 
 
 
