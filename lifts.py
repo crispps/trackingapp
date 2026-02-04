@@ -24,9 +24,16 @@ class Lift:
             self.data = json.load(f)
             f.close()
 
-    def add_lift(self, lift: str) -> None:
+    def add_lift(self, lift: str) -> bool:
+        exists = False
+        for key in list(self.data.keys()):
+            if lift == key:
+                exists = True
+        if not exists:
             self.data[lift] = {}
             self.dump_data()
+            self.update_data()
+        return exists
 
     def get_lifts(self) -> list:
         return list(self.data.keys())
