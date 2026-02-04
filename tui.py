@@ -69,3 +69,14 @@ def get_lift_data() -> tuple:
     lift_reps = input("Enter lift reps: ")
     lift_rpe = input("Enter lift RPE: ")
     return lift_name, lift_date, lift_weight, lift_sets, lift_reps, lift_rpe
+
+
+def get_lift() -> str:
+    lift = input("Enter lift name: ")
+    return lift
+
+
+def display_history(history: list) -> None:
+    print("Lift history:")
+    for entry in history:
+        print(f"{entry['date']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - @{entry['rpe']}")

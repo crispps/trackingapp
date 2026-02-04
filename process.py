@@ -55,3 +55,14 @@ def submit_lift_data() -> None:
         if not lift_exists:
             tui.lift_doesnt_exist()
     user.add_data(data)
+
+
+def lift_history() -> None:
+    lift_exists = False
+    while not lift_exists:
+        data = tui.get_lift()
+        lift_exists = user.lift_exists(data)
+        if not lift_exists:
+            tui.lift_doesnt_exist()
+    lift_history = user.lift_history(data)
+    tui.display_history(lift_history)

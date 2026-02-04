@@ -6,10 +6,10 @@ of lifts within a file for future potential features
 
 
 BASE LEVEL FEATURES
--Login system 
--lift selection
--submit lift data
--lift history
+-Login system !
+-lift selection !
+-submit lift data !
+-lift history !
 -data visualisation
 
 POTENTIAL FEATURES

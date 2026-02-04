@@ -13,6 +13,7 @@ while not exit:
     choice = tui.main_menu()
     if choice == "1":
         pc.submit_lift_data()
-
+    elif choice == "2":
+        pc.lift_history()
 
 

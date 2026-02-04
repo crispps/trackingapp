@@ -12,5 +12,8 @@ class User:
             return True
         return False
 
-    def add_data(self, data: tuple):
+    def add_data(self, data: tuple) -> None:
         self.data.add_data(self.username, data[0], data[1], data[2], data[3], data[4], data[5])
+
+    def lift_history(self, lift: str) -> list:
+        return self.data.get_history(lift, self.username)
