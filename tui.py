@@ -25,6 +25,10 @@ def lift_doesnt_exist() -> None:
     print("Lift doesn't exist")
 
 
+def lift_exists() -> None:
+    print("Lift already exists")
+
+
 def titletext(title: str) -> None:
     print("-"*len(title))
     print(title)

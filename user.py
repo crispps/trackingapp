@@ -4,6 +4,9 @@ class User:
         self.username = username
         self.data = Lift()
 
+    def add_lift(self, lift: str) -> None:
+        self.data.add_lift(lift)
+
     def get_lifts(self) -> list:
         return list(self.data.get_lifts())
 

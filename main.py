@@ -15,5 +15,6 @@ while not exit:
         pc.submit_lift_data()
     elif choice == "2":
         pc.lift_history()
-
+    elif choice == "3":
+        pc.create_lift()
 

@@ -47,6 +47,17 @@ def create_user() -> None:
     tui.user_created()
 
 
+def create_lift() -> None:
+    lift_exists = False
+    while not lift_exists:
+        lift_name = tui.get_lift().lower()
+        lift_exists = user.lift_exists
+        if not lift_exists:
+            tui.lift_exists()
+    user.add_lift(lift_name)
+
+
+
 def submit_lift_data() -> None:
     lift_exists = False
     while not lift_exists:
