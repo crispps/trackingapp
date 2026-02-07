@@ -66,3 +66,4 @@ def lift_history() -> None:
             tui.lift_doesnt_exist()
     lift_history = user.lift_history(data)
     tui.display_history(lift_history)
+
