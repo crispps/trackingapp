@@ -1,10 +1,29 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
+    QHBoxLayout, QComboBox
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
 import sys
 import process as pc
 
 app = QApplication([])
+
+
+class InputLift(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.lifts = pc.user.get_lifts()
+        self.lift_selection = QComboBox(self)
+        self.lift_selection.addItems(self.lifts)
+        self.label = QLabel("avhddg", self)
+
+        # layouts
+
+        self.Vlayout = QVBoxLayout()
+        self.Hlayout = QHBoxLayout()
+        self.Hlayout.addWidget(self.lift_selection)
+        self.Vlayout.addLayout(self.Hlayout)
+        self.Vlayout.addWidget(self.label)
+        self.setLayout(self.Vlayout)
 
 
 class LoginWindow(QMainWindow):
@@ -66,9 +85,11 @@ class LoginWindow(QMainWindow):
         logged_in = pc.login(self.username.text())
         if not logged_in:
             self.error_label.setText("Invalid user")
+            self.error_label.show()
         else:
-            self.error_label.setText("valid user")
-        self.error_label.show()
+            self.w = MainWindow()
+            self.w.show()
+            self.close()
 
     def create_account(self, ):
         if self.w is None:
@@ -126,6 +147,41 @@ class CreateAccount(QWidget):
             self.close()
         else:
             self.error_label.show()
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Setting up window
+        self.w = None  # Blank variable to set up sub window to create account
+        self.setFixedSize(800, 500)
+        self.setWindowTitle("trackingapp")
+
+        # creating widgets
+
+        self.menu = QComboBox(self)
+        self.menu.addItems(["Home", "Input lift", "View lifts", "New lift"])
+        self.setCentralWidget(self.menu)
+        self.display = QWidget()
+
+        # layouts
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.menu)
+        self.layout.addWidget(self.display)
+
+        self.setLayout(self.layout)
+
+        # signals
+
+        self.menu.currentIndexChanged.connect(self.menu_option)
+
+    def menu_option(self):
+        if self.menu.currentIndex() == 1:
+            self.display = InputLift()
+
+            # doesnt set display to input_lift widget
 
 
 main_window = LoginWindow()
