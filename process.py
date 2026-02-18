@@ -15,12 +15,10 @@ def check_login(username: str) -> bool:
     return False
 
 
-def login() -> bool:
+def login(username: str) -> bool:
     global user
     logged_in = False
-    username = ""
     if not logged_in:
-        username = tui.get_username()
         logged_in = check_login(username)
 
     user = User(username)

@@ -62,19 +62,8 @@ class LoginWindow(QMainWindow):
         self.login.clicked.connect(self.login_user)
         self.signup.clicked.connect(self.create_account)
 
-    def check_login(self) -> bool:
-        import json
-        with open("data/users.json", "r") as f:
-            users = json.load(f)
-        for i in users:
-            if self.username.text() == i:
-                return True
-        return False
-
     def login_user(self):
-        logged_in = False
-        username = self.username.text()
-        logged_in = self.check_login()
+        logged_in = pc.login(self.username.text())
         if not logged_in:
             self.error_label.setText("Invalid user")
         else:
@@ -105,7 +94,8 @@ class CreateAccount(QWidget):
         self.create_button.setFixedSize(100, 50)
 
         self.error_label = QLabel("Username already in use", self)
-        self.error_label.move(150, 68)
+        self.error_label.setFixedWidth(200)
+        self.error_label.move(75, 50)
         self.error_label.hide()
 
         # fonts
