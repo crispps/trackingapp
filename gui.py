@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, QHBoxLayout
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
-from user import User
 import sys
+import process as pc
 
 app = QApplication([])
 
@@ -60,6 +60,7 @@ class LoginWindow(QMainWindow):
         # Setting up signals
 
         self.login.clicked.connect(self.login_user)
+        self.signup.clicked.connect(self.create_account)
 
     def check_login(self) -> bool:
         import json
@@ -80,11 +81,61 @@ class LoginWindow(QMainWindow):
             self.error_label.setText("valid user")
         self.error_label.show()
 
+    def create_account(self, ):
+        if self.w is None:
+            self.w = CreateAccount()
+        self.w.show()
 
 
 class CreateAccount(QWidget):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("create account")
+        self.setFixedSize(300, 200)
+
+        # creating widgets
+
+        self.titletext = QLabel("Create Account", self)
+        self.titletext.setFixedHeight(50)
+
+        self.username = QLineEdit()
+        self.username.setPlaceholderText("username:")
+
+        self.create_button = QPushButton("Create")
+        self.create_button.setFixedSize(100, 50)
+
+        self.error_label = QLabel("Username already in use", self)
+        self.error_label.move(150, 68)
+        self.error_label.hide()
+
+        # fonts
+
+        self.font = QFont()
+        self.font.setPointSize(20)
+        self.titletext.setFont(self.font)
+        self.username.setFont(self.font)
+        self.create_button.setFont(self.font)
+
+        # creating layouts
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.titletext)
+        self.layout.addWidget(self.username)
+        self.layout.addWidget(self.create_button)
+
+        self.setLayout(self.layout)
+
+        # signals
+
+        self.create_button.clicked.connect(self.create_account)
+
+    def create_account(self):
+        exists = pc.check_login(self.username.text())
+        if not exists:
+            pc.create_user(self.username.text())
+            self.close()
+        else:
+            self.error_label.show()
 
 
 main_window = LoginWindow()
