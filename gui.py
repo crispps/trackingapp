@@ -8,9 +8,6 @@ import process as pc
 app = QApplication([])
 
 
-
-
-
 class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -170,9 +167,23 @@ class InputLift(QWidget):
         # signals
         self.submit.clicked.connect(self.submit_data)
 
-    def submit_data(self):
-        error_message = ""
+    def check_data(self, data) -> str:
+        return ""
 
+    def submit_data(self) -> None:
+        error_message = ""
+        lift_data = {
+            "lift": self.lift_selection.currentText(),
+            "date": self.date.text(),
+            "weight": self.weight.text(),
+            "sets": self.sets.text(),
+            "reps": self.reps.text(),
+            "rpe": self.rpe.text()
+        }
+        for data in lift_data:
+            error_message += self.check_data(lift_data[data])
+        if len(error_message) == 0:
+            pc.submit_lift_data(lift_data)
 
 
 class MainWindow(QMainWindow):

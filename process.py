@@ -5,9 +5,6 @@ from user import User
 user: object
 
 
-def valid_format(string: str) -> bool:
-    pass
-
 # returns bool if login already exists
 def check_login(username: str) -> bool:
     with open("data/users.json", "r") as f:
@@ -45,13 +42,7 @@ def create_user(username: str) -> bool:
     return True
 
 
-def submit_lift_data() -> None:
-    lift_exists = False
-    while not lift_exists:
-        data = tui.get_lift_data()
-        lift_exists = user.lift_exists(data[0])
-        if not lift_exists:
-            tui.lift_doesnt_exist()
+def submit_lift_data(data: dict[str, str]) -> None:
     user.add_data(data)
 
 
@@ -64,4 +55,3 @@ def lift_history() -> None:
             tui.lift_doesnt_exist()
     lift_history = user.lift_history(data)
     tui.display_history(lift_history)
-

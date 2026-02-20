@@ -8,20 +8,15 @@ class Lift:
             self.data = json.load(f)
             f.close()
 
-    def add_data(self, user: str, lift: str, date: str, weight: str, sets: str, reps: str, rpe: str):
-        if user not in self.data[lift]:
-            self.data[lift][user] = []
-        self.data[lift][user].append({"date": date, "weight": weight, "sets": sets, "reps": reps, "rpe": rpe})
+    def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
+        if user not in self.data[lift_name]:
+            self.data[lift_name][user] = []
+        self.data[lift_name][user].append(data)
         self.dump_data()
 
     def dump_data(self) -> None:
         with open(self.path, "w") as f:
             json.dump(self.data, f)
-            f.close()
-
-    def update_data(self):
-        with open(self.path, "r") as f:
-            self.data = json.load(f)
             f.close()
 
     def add_lift(self, lift: str) -> bool:
@@ -32,7 +27,6 @@ class Lift:
         if not exists:
             self.data[lift] = {}
             self.dump_data()
-            self.update_data()
         return exists
 
     def get_lifts(self) -> list:
@@ -40,3 +34,5 @@ class Lift:
 
     def get_history(self, lift: str, user: str) -> list:
         return self.data[lift][user]
+
+
