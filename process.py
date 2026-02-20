@@ -5,6 +5,9 @@ from user import User
 user: object
 
 
+def valid_format(string: str) -> bool:
+    pass
+
 # returns bool if login already exists
 def check_login(username: str) -> bool:
     with open("data/users.json", "r") as f:

@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
-    QHBoxLayout, QComboBox
+    QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
 import sys
@@ -8,22 +8,7 @@ import process as pc
 app = QApplication([])
 
 
-class InputLift(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.lifts = pc.user.get_lifts()
-        self.lift_selection = QComboBox(self)
-        self.lift_selection.addItems(self.lifts)
-        self.label = QLabel("avhddg", self)
 
-        # layouts
-
-        self.Vlayout = QVBoxLayout()
-        self.Hlayout = QHBoxLayout()
-        self.Hlayout.addWidget(self.lift_selection)
-        self.Vlayout.addLayout(self.Hlayout)
-        self.Vlayout.addWidget(self.label)
-        self.setLayout(self.Vlayout)
 
 
 class LoginWindow(QMainWindow):
@@ -31,7 +16,7 @@ class LoginWindow(QMainWindow):
         super().__init__()
 
         # Setting up window
-        self.w = None   # Blank variable to set up sub window to create account
+        self.w = None  # Blank variable to set up sub window to create account
         self.setFixedSize(600, 400)
         self.setWindowTitle("trackingapp")
 
@@ -149,6 +134,47 @@ class CreateAccount(QWidget):
             self.error_label.show()
 
 
+class InputLift(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.lifts = pc.user.get_lifts()
+        self.lift_selection = QComboBox()
+        self.lift_selection.addItems(self.lifts)
+        self.date = QLineEdit()
+        self.date.setPlaceholderText("date:")
+        self.weight = QLineEdit()
+        self.weight.setPlaceholderText("weight:")
+        self.sets = QLineEdit()
+        self.sets.setPlaceholderText("sets:")
+        self.reps = QLineEdit()
+        self.reps.setPlaceholderText("reps:")
+        self.rpe = QLineEdit()
+        self.rpe.setPlaceholderText("rpe:")
+        self.submit = QPushButton("Submit")
+
+        # layouts
+
+        self.Vlayout = QVBoxLayout()
+        self.Hlayout = QHBoxLayout()
+        self.Hlayout.addWidget(self.lift_selection)
+        self.Vlayout.addLayout(self.Hlayout)
+        self.Vlayout.addWidget(self.date)
+        self.Vlayout.addWidget(self.weight)
+        self.Vlayout.addWidget(self.sets)
+        self.Vlayout.addWidget(self.reps)
+        self.Vlayout.addWidget(self.rpe)
+        self.Vlayout.addWidget(self.submit)
+
+        self.setLayout(self.Vlayout)
+
+        # signals
+        self.submit.clicked.connect(self.submit_data)
+
+    def submit_data(self):
+        error_message = ""
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -158,30 +184,39 @@ class MainWindow(QMainWindow):
         self.setFixedSize(800, 500)
         self.setWindowTitle("trackingapp")
 
+        # central widget
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
+
         # creating widgets
 
         self.menu = QComboBox(self)
-        self.menu.addItems(["Home", "Input lift", "View lifts", "New lift"])
-        self.setCentralWidget(self.menu)
+        self.menu_options = ["Home", "Input lift", "View lifts", "New lift"]
+        self.menu.addItems(self.menu_options)
         self.display = QWidget()
 
         # layouts
 
-        self.layout = QVBoxLayout()
+        self.layout = QVBoxLayout(self.central_widget)
         self.layout.addWidget(self.menu)
         self.layout.addWidget(self.display)
 
         self.setLayout(self.layout)
 
         # signals
-
         self.menu.currentIndexChanged.connect(self.menu_option)
 
     def menu_option(self):
-        if self.menu.currentIndex() == 1:
-            self.display = InputLift()
+        option = self.menu_options[self.menu.currentIndex()]
 
-            # doesnt set display to input_lift widget
+        # remove old widget
+        old_widget = self.layout.itemAt(1).widget()
+        self.layout.removeWidget(old_widget)
+        old_widget.hide()
+        if option == "Input lift":
+            self.display = InputLift()
+        self.layout.addWidget(self.display)
+        self.display.show()
 
 
 main_window = LoginWindow()
