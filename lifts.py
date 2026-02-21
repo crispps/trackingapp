@@ -2,11 +2,15 @@ import json
 
 
 class Lift:
-    def __init__(self):
-        self.path = "data/lifts.json"
+    def __init__(self, path: str):
+        self.path = path
+        self.data = self.load_lift_data()
+
+    def load_lift_data(self) -> str:
         with open(self.path, "r") as f:
-            self.data = json.load(f)
+            data = json.load(f)
             f.close()
+        return data
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
         if user not in self.data[lift_name]:
