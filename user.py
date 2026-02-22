@@ -18,3 +18,9 @@ class User:
 
     def lift_history(self, lift: str) -> list:
         return self.data.get_history(lift, self.username)
+
+    def add_lift(self, lift: str) -> bool:
+        if self.lift_exists(lift):
+            return False
+        self.data.add_lift(lift)
+        return True

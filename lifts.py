@@ -23,20 +23,14 @@ class Lift:
             json.dump(self.data, f)
             f.close()
 
-    def add_lift(self, lift: str) -> bool:
-        exists = False
-        for key in list(self.data.keys()):
-            if lift == key:
-                exists = True
-        if not exists:
-            self.data[lift] = {}
-            self.dump_data()
-        return exists
+    def add_lift(self, lift: str) -> None:
+        self.data[lift] = {}
+        self.dump_data()
 
     def get_lifts(self) -> list:
         return list(self.data.keys())
 
-    def get_history(self, lift: str, user: str) -> list:
+    def get_history(self, lift: str, user: str) -> str:
         return self.data[lift][user]
 
 
