@@ -1,0 +1,9 @@
+FEATURE TO ADD
+
+- input lift data !
+- create new lift !
+- view lift history !
+    - view lift history by date
+- data visualization
+    - progression on lift based on rep count
+    - progression on lift based on

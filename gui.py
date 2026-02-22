@@ -211,7 +211,13 @@ class ViewLifts(QWidget):
         history = pc.lift_history(lift_name)
         self.lift_history.clear()
         for entry in history:
-            self.lift_history.addItem(f"{entry['date']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+            self.lift_history.addItem(f"{entry['date']} - {entry['weight']}kg - "
+                                      f"{entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+
+
+class DataVisualisation(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class NewLift(QWidget):
@@ -264,7 +270,7 @@ class MainWindow(QMainWindow):
         # creating widgets
 
         self.menu = QComboBox(self)
-        self.menu_options = ["Home", "Input lift", "View lifts", "New lift"]
+        self.menu_options = ["Home", "Input lift", "View lifts", "Data visualisation", "New lift"]
         self.menu.addItems(self.menu_options)
         self.display = QWidget()
 
@@ -296,7 +302,7 @@ class MainWindow(QMainWindow):
         self.display.show()
 
 
-
-main_window = LoginWindow()
-main_window.show()
-app.exec()
+def run_gui() -> None:
+    main_window = LoginWindow()
+    main_window.show()
+    app.exec()

@@ -7,6 +7,10 @@ def mock_get_user_list():
     return ["username1", "username2"]
 
 
+def get_user_list_stub():
+    return ["username1", "username2"]
+
+
 def test_check_return_path_unit():
     assert pc.get_users_path() == "data/users.json"
 
@@ -41,3 +45,15 @@ def test_login_doesnt_create_user_object(monkeypatch):
     monkeypatch.setattr(pc, "check_username_exists", lambda x: False)
     pc.login("username2")
     assert pc.user is None
+
+
+def test_create_user_happy_unit(monkeypatch):
+    monkeypatch.setattr(pc, "get_user_list", get_user_list_stub)
+    monkeypatch.setattr(pc, "add_user_to_file", lambda x: None)
+    assert pc.create_user("username3")
+
+
+def test_create_user_sad_unit(monkeypatch):
+    monkeypatch.setattr(pc, "get_user_list", get_user_list_stub)
+    assert not pc.create_user("username2")
+
