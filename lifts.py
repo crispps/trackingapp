@@ -30,7 +30,7 @@ class Lift:
     def get_lifts(self) -> list:
         return list(self.data.keys())
 
-    def get_history(self, lift: str, user: str) -> str:
+    def get_history(self, lift: str, user: str):
         return self.data[lift][user]
 
 

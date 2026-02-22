@@ -65,12 +65,10 @@ def submit_lift_data(data: dict[str, str]) -> None:
 
 
 # not fixed for gui
-def lift_history() -> None:
-    lift_exists = False
-    while not lift_exists:
-        data = tui.get_lift()
-        lift_exists = user.lift_exists(data)
-        if not lift_exists:
-            tui.lift_doesnt_exist()
-    lift_history = user.lift_history(data)
-    tui.display_history(lift_history)
+def lift_history(lift_name) -> list:
+    lift_history = user.lift_history(lift_name)
+    return list(lift_history)
+
+
+def new_lift(lift_name) -> bool:
+    return user.add_lift(lift_name)

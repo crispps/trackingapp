@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
-    QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea
+    QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
 import sys
@@ -186,6 +186,68 @@ class InputLift(QWidget):
             pc.submit_lift_data(lift_data)
 
 
+class ViewLifts(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # creating widgets
+
+        self.lift_select = QComboBox()
+        self.lift_select.addItems(pc.user.get_lifts())
+        self.lift_history = QListWidget()
+
+        # layouts
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.lift_select)
+        self.layout.addWidget(self.lift_history)
+        self.setLayout(self.layout)
+
+        # signals
+
+        self.lift_select.currentIndexChanged.connect(self.update_history)
+
+    def update_history(self):
+        lift_name = self.lift_select.currentText()
+        history = pc.lift_history(lift_name)
+        self.lift_history.clear()
+        for entry in history:
+            self.lift_history.addItem(f"{entry['date']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+
+
+class NewLift(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # creating widgets
+
+        self.existing_lifts = QListWidget()
+        self.existing_lifts.addItems(pc.user.get_lifts())
+        self.enter_lift_text = QLabel("Enter lift name:")
+        self.lift_name = QLineEdit()
+        self.submit = QPushButton("Submit")
+
+        # layouts
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.existing_lifts)
+        self.layout.addWidget(self.enter_lift_text)
+        self.layout.addWidget(self.lift_name)
+        self.layout.addWidget(self.submit)
+        self.setLayout(self.layout)
+
+        # signals
+
+        self.submit.clicked.connect(self.create_lift)
+
+    def create_lift(self):
+        lift_name = self.lift_name.text()
+        created = pc.new_lift(lift_name)
+        if created:
+            self.existing_lifts.addItem(lift_name)
+        else:
+            self.enter_lift_text.setText("Enter lift name:     Lift already exists")
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -226,8 +288,13 @@ class MainWindow(QMainWindow):
         old_widget.hide()
         if option == "Input lift":
             self.display = InputLift()
+        elif option == "New lift":
+            self.display = NewLift()
+        elif option == "View lifts":
+            self.display = ViewLifts()
         self.layout.addWidget(self.display)
         self.display.show()
+
 
 
 main_window = LoginWindow()
