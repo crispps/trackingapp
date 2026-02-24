@@ -6,4 +6,10 @@ FEATURE TO ADD
     - view lift history by date
 - data visualization
     - progression on lift based on rep count
-    - progression on lift based on
+    - progression between 2 users by percentage and weight
+- database
+    - add user authentication
+    - add block data
+        - week in the block, taper, etc.
+- Data visualization with block data
+    - progression on lifts in blocks by percentage
