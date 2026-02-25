@@ -122,8 +122,9 @@ class CreateAccount(QWidget):
 
         self.create_button.clicked.connect(self.create_account)
 
+    #   FIXED FOR DATABASE
     def create_account(self):
-        exists = pc.check_login(self.username.text())
+        exists = pc.check_username_exists(self.username.text())
         if not exists:
             pc.create_user(self.username.text())
             self.close()

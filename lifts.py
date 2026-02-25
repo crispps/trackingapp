@@ -1,4 +1,8 @@
 import json
+import sqlite3
+from sqlite3 import Connection
+
+from database import Database
 
 
 class Lift:
@@ -6,11 +10,10 @@ class Lift:
         self.path = path
         self.data = self.load_lift_data()
 
-    def load_lift_data(self) -> str:
-        with open(self.path, "r") as f:
-            data = json.load(f)
-            f.close()
-        return data
+    def load_lift_data(self) -> object:
+        db = Database(self.path)
+        db.connect()
+        return db
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
         if user not in self.data[lift_name]:
@@ -24,11 +27,14 @@ class Lift:
             f.close()
 
     def add_lift(self, lift: str) -> None:
-        self.data[lift] = {}
-        self.dump_data()
+        self.data.fetchall("INSERT INTO lifttype VALUES (lift) ")
 
     def get_lifts(self) -> list:
-        return list(self.data.keys())
+        lifts = self.data.fetchall("SELECT name FROM lifttype")
+        existing_lifts = []
+        for i in lifts:
+            existing_lifts.append(i["name"])
+        return existing_lifts
 
     def get_history(self, lift: str, user: str):
         return self.data[lift][user]

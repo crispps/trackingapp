@@ -1,8 +1,17 @@
 import json
 import tui
 from user import User
+from database import Database
 
 user: object
+
+
+def get_database_path() -> str:
+    return "data/trackingapp.db"
+
+
+db = Database(get_database_path())
+db.connect()
 
 
 def get_users_path() -> str:
@@ -16,10 +25,12 @@ def get_data_path() -> str:
 
 
 def get_user_list() -> list:
-    with open(get_users_path(), "r") as f:
-        users = json.load(f)
-        f.close()
-    return users
+    print("get_user_list")
+    result = db.fetchall("SELECT username FROM users")
+    user_list = []
+    for i in result:
+        user_list.append(i["username"])
+    return user_list
 
 
 def check_username_exists(username: str) -> bool:
@@ -30,27 +41,20 @@ def check_username_exists(username: str) -> bool:
     return False
 
 
-# returns bool if login already exists
-def check_login(username: str) -> bool:
-    return check_username_exists(username)
-
-
 def login(username: str) -> bool:
     global user
-    logged_in = check_login(username)
+    logged_in = check_username_exists(username)
     if logged_in:
-        user = User(username, get_data_path())
+        user = User(username, get_database_path())
     else:
         user = None
+    db.disconnect()
     return logged_in
 
 
 def add_user_to_file(username: str) -> None:
-    users = get_user_list()
-    with open(get_users_path(), "w") as f:
-        users.append(username)
-        json.dump(users, f)
-        f.close()
+
+    db.execute("INSERT INTO users (username) VALUES (?)", (username,))
 
 
 def create_user(username: str) -> bool:

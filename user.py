@@ -5,7 +5,7 @@ class User:
         self.data = Lift(path)
 
     def get_lifts(self) -> list:
-        return list(self.data.get_lifts())
+        return self.data.get_lifts()
 
     def lift_exists(self, lift: str) -> bool:
         if lift in self.data.get_lifts():
@@ -20,7 +20,7 @@ class User:
         return self.data.get_history(lift, self.username)
 
     def add_lift(self, lift: str) -> bool:
-        if self.lift_exists(lift):
-            return False
+        #if self.lift_exists(lift):
+        #    return False
         self.data.add_lift(lift)
         return True
