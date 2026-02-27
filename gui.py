@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
-    QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget
+    QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget, QCheckBox
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
 import sys
@@ -65,6 +65,7 @@ class LoginWindow(QMainWindow):
 
     def login_user(self):
         logged_in = pc.login(self.username.text())
+        print(logged_in)
         if not logged_in:
             self.error_label.setText("Invalid user")
             self.error_label.show()
@@ -138,6 +139,8 @@ class InputLift(QWidget):
         self.lifts = pc.user.get_lifts()
         self.lift_selection = QComboBox()
         self.lift_selection.addItems(self.lifts)
+        self.block = QComboBox()
+        self.block.addItems(pc.get_blocks())
         self.date = QLineEdit()
         self.date.setPlaceholderText("date:")
         self.weight = QLineEdit()
@@ -148,6 +151,7 @@ class InputLift(QWidget):
         self.reps.setPlaceholderText("reps:")
         self.rpe = QLineEdit()
         self.rpe.setPlaceholderText("rpe:")
+        self.top_set = QCheckBox("Top set")
         self.submit = QPushButton("Submit")
 
         # layouts
@@ -156,11 +160,13 @@ class InputLift(QWidget):
         self.Hlayout = QHBoxLayout()
         self.Hlayout.addWidget(self.lift_selection)
         self.Vlayout.addLayout(self.Hlayout)
+        self.Vlayout.addWidget(self.block)
         self.Vlayout.addWidget(self.date)
         self.Vlayout.addWidget(self.weight)
         self.Vlayout.addWidget(self.sets)
         self.Vlayout.addWidget(self.reps)
         self.Vlayout.addWidget(self.rpe)
+        self.Vlayout.addWidget(self.top_set)
         self.Vlayout.addWidget(self.submit)
 
         self.setLayout(self.Vlayout)
@@ -175,11 +181,13 @@ class InputLift(QWidget):
         error_message = ""
         lift_data = {
             "lift": self.lift_selection.currentText(),
+            "block": self.block.text(),
             "date": self.date.text(),
             "weight": self.weight.text(),
             "sets": self.sets.text(),
             "reps": self.reps.text(),
-            "rpe": self.rpe.text()
+            "rpe": self.rpe.text(),
+            "top set": self.top_set.isChecked()
         }
         for data in lift_data:
             error_message += self.check_data(lift_data[data])

@@ -13,7 +13,7 @@ class Lift:
         return db
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
-        pass
+        self.data.execute("INSERT INTO lifts (lifttype,)")
 
     def dump_data(self) -> None:
         with open(self.path, "w") as f:
@@ -21,7 +21,6 @@ class Lift:
             f.close()
 
     def add_lift(self, lift: str) -> None:
-        print("asgfsdfghfd")
         self.data.execute("INSERT INTO lifttype (name) VALUES (?) ", (lift,))
 
     def create_block(self, block_type, block_name, username):
