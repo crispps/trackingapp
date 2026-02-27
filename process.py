@@ -64,6 +64,10 @@ def create_user(username: str) -> bool:
     return True
 
 
+def create_block(block_type, block_name) -> bool:
+    return user.create_block(block_type, block_name)
+
+
 def submit_lift_data(data: dict[str, str]) -> None:
     user.add_data(data)
 
@@ -76,3 +80,8 @@ def lift_history(lift_name) -> list:
 
 def new_lift(lift_name) -> bool:
     return user.add_lift(lift_name)
+
+
+def get_blocks() -> list:
+    result = user.get_blocks()
+    return [row["name"] for row in result]

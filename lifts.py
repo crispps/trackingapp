@@ -1,7 +1,4 @@
 import json
-import sqlite3
-from sqlite3 import Connection
-
 from database import Database
 
 
@@ -16,10 +13,7 @@ class Lift:
         return db
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
-        if user not in self.data[lift_name]:
-            self.data[lift_name][user] = []
-        self.data[lift_name][user].append(data)
-        self.dump_data()
+        pass
 
     def dump_data(self) -> None:
         with open(self.path, "w") as f:
@@ -27,7 +21,17 @@ class Lift:
             f.close()
 
     def add_lift(self, lift: str) -> None:
-        self.data.fetchall("INSERT INTO lifttype VALUES (lift) ")
+        print("asgfsdfghfd")
+        self.data.execute("INSERT INTO lifttype (name) VALUES (?) ", (lift,))
+
+    def create_block(self, block_type, block_name, username):
+        result = self.get_blocks(username)
+        for row in result:
+            if row["name"] == block_name:
+                return False
+        self.data.execute("INSERT INTO blocks (blocktype, userid, name) VALUES (?, (SELECT userid FROM users WHERE "
+                          "username = ?), ?)", (block_type, username, block_name))
+        return True
 
     def get_lifts(self) -> list:
         lifts = self.data.fetchall("SELECT name FROM lifttype")
@@ -35,6 +39,11 @@ class Lift:
         for i in lifts:
             existing_lifts.append(i["name"])
         return existing_lifts
+
+    def get_blocks(self, username) -> list:
+        blocks = self.data.fetchall("SELECT name FROM blocks WHERE userid = (SELECT userid FROM users "
+                                    "WHERE username = ?)", (username,))
+        return blocks
 
     def get_history(self, lift: str, user: str):
         return self.data[lift][user]

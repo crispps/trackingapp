@@ -248,11 +248,47 @@ class NewLift(QWidget):
 
     def create_lift(self):
         lift_name = self.lift_name.text()
+        print(lift_name)
         created = pc.new_lift(lift_name)
         if created:
             self.existing_lifts.addItem(lift_name)
         else:
             self.enter_lift_text.setText("Enter lift name:     Lift already exists")
+
+
+class NewBlock(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # creating widgets
+
+        self.existing_blocks = QListWidget()
+        self.existing_blocks.addItems(pc.get_blocks())
+        self.block_type = QComboBox()
+        self.block_type.addItems(["Training", "Peaking", "Deload", "Taper"])
+        self.name_label = QLabel("Block Name:")
+        self.block_name = QLineEdit()
+        self.submit = QPushButton("Submit")
+
+        # layouts
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.existing_blocks)
+        self.layout.addWidget(self.block_type)
+        self.layout.addWidget(self.block_name)
+        self.layout.addWidget(self.submit)
+        self.setLayout(self.layout)
+
+        # signals
+
+        self.submit.clicked.connect(self.create_block)
+
+    def create_block(self):
+        created = pc.create_block(self.block_type.currentText(), self.block_name.text())
+        if created:
+            self.existing_blocks.addItem(self.block_name.text())
+        else:
+            self.name_label.setText("Block Name:     Block created")
 
 
 class MainWindow(QMainWindow):
@@ -271,7 +307,7 @@ class MainWindow(QMainWindow):
         # creating widgets
 
         self.menu = QComboBox(self)
-        self.menu_options = ["Home", "Input lift", "View lifts", "Data visualisation", "New lift"]
+        self.menu_options = ["Home", "Input lift", "View lifts", "Data visualisation", "New lift", "New block"]
         self.menu.addItems(self.menu_options)
         self.display = QWidget()
 
@@ -299,6 +335,8 @@ class MainWindow(QMainWindow):
             self.display = NewLift()
         elif option == "View lifts":
             self.display = ViewLifts()
+        elif option == "New block":
+            self.display = NewBlock()
         self.layout.addWidget(self.display)
         self.display.show()
 

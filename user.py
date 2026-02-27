@@ -7,6 +7,9 @@ class User:
     def get_lifts(self) -> list:
         return self.data.get_lifts()
 
+    def get_blocks(self) -> list:
+        return self.data.get_blocks(self.username)
+
     def lift_exists(self, lift: str) -> bool:
         if lift in self.data.get_lifts():
             return True
@@ -20,7 +23,10 @@ class User:
         return self.data.get_history(lift, self.username)
 
     def add_lift(self, lift: str) -> bool:
-        #if self.lift_exists(lift):
+        #   if self.lift_exists(lift):
         #    return False
         self.data.add_lift(lift)
         return True
+
+    def create_block(self, block_type, block_name) -> bool:
+        return self.data.create_block(block_type, block_name, self.username)

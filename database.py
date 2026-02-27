@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class Database:
     def __init__(self, db_path: str):
         self.db_path = db_path
@@ -19,16 +20,28 @@ class Database:
             self.cursor = None
 
     def execute(self, query: str, params: tuple = ()):
-        self.cursor.execute(query, params)
-        self.conn.commit()
+        try:
+            self.cursor.execute(query, params)
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print(f"[DB ERROR] execute: {e} | query: {query} | params: {params}")
+            raise
 
     def fetchone(self, query: str, params: tuple = ()):
-        self.cursor.execute(query, params)
-        return self.cursor.fetchone()
+        try:
+            self.cursor.execute(query, params)
+            return self.cursor.fetchone()
+        except sqlite3.Error as e:
+            print(f"[DB ERROR] fetchone: {e} | query: {query} | params: {params}")
+            raise
 
     def fetchall(self, query: str, params: tuple = ()):
-        self.cursor.execute(query, params)
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute(query, params)
+            return self.cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"[DB ERROR] fetchall: {e} | query: {query} | params: {params}")
+            raise
 
     def __enter__(self):
         self.connect()
