@@ -13,7 +13,11 @@ class Lift:
         return db
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
-        self.data.execute("INSERT INTO lifts (lifttype,)")
+        self.data.execute("INSERT INTO lifts (blockid, userid, liftname, date, weight, sets, reps, rpe, topset) "
+                          "VALUES ((SELECT userid FROM users WHERE username = ?),(SELECT blockid FROM blocks WHERE "
+                          "name = ?) , ?, ?, ?, ?, ?, ?, ?)",
+                          (user, data["block"], lift_name, data["date"], data["weight"], data["sets"], data["reps"],
+                           data["rpe"], data["top set"]))
 
     def dump_data(self) -> None:
         with open(self.path, "w") as f:

@@ -137,12 +137,13 @@ class InputLift(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.lifts = pc.user.get_lifts()
+        self.error_label = QLabel()
         self.lift_selection = QComboBox()
         self.lift_selection.addItems(self.lifts)
         self.block = QComboBox()
         self.block.addItems(pc.get_blocks())
         self.date = QLineEdit()
-        self.date.setPlaceholderText("date:")
+        self.date.setPlaceholderText("date (YYYY-MM-DD):")
         self.weight = QLineEdit()
         self.weight.setPlaceholderText("weight:")
         self.sets = QLineEdit()
@@ -159,6 +160,7 @@ class InputLift(QWidget):
         self.Vlayout = QVBoxLayout()
         self.Hlayout = QHBoxLayout()
         self.Hlayout.addWidget(self.lift_selection)
+        self.Hlayout.addWidget(self.error_label)
         self.Vlayout.addLayout(self.Hlayout)
         self.Vlayout.addWidget(self.block)
         self.Vlayout.addWidget(self.date)
@@ -174,14 +176,26 @@ class InputLift(QWidget):
         # signals
         self.submit.clicked.connect(self.submit_data)
 
-    def check_data(self, data) -> str:
-        return ""
+    def check_data(self, lift_data) -> str:
+        error_message = ""
+        # DATE CHECK
+        if not pc.check_date_format(lift_data["date"]):
+            error_message += "Invalid date format\n"
+        if not pc.check_if_float(lift_data["weight"]):
+            error_message += "Weight must be a number\n"
+        if not pc.check_if_int(lift_data["sets"]):
+            error_message += "Sets must be an integer\n"
+        if not pc.check_if_int(lift_data["reps"]):
+            error_message += "Reps must be an integer\n"
+        if not pc.check_if_int(lift_data["rpe"]):
+            error_message += "RPE must be an integer\n"
+        return error_message
 
     def submit_data(self) -> None:
         error_message = ""
         lift_data = {
             "lift": self.lift_selection.currentText(),
-            "block": self.block.text(),
+            "block": self.block.currentText(),
             "date": self.date.text(),
             "weight": self.weight.text(),
             "sets": self.sets.text(),
@@ -189,10 +203,11 @@ class InputLift(QWidget):
             "rpe": self.rpe.text(),
             "top set": self.top_set.isChecked()
         }
-        for data in lift_data:
-            error_message += self.check_data(lift_data[data])
+        error_message = self.check_data(lift_data)
         if len(error_message) == 0:
             pc.submit_lift_data(lift_data)
+        else:
+            self.error_label.setText(error_message)
 
 
 class ViewLifts(QWidget):
@@ -235,6 +250,7 @@ class NewLift(QWidget):
 
         # creating widgets
 
+        self.error_label = QLabel()
         self.existing_lifts = QListWidget()
         self.existing_lifts.addItems(pc.user.get_lifts())
         self.enter_lift_text = QLabel("Enter lift name:")
@@ -245,6 +261,7 @@ class NewLift(QWidget):
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.existing_lifts)
+        self.layout.addWidget(self.error_label)
         self.layout.addWidget(self.enter_lift_text)
         self.layout.addWidget(self.lift_name)
         self.layout.addWidget(self.submit)
@@ -256,12 +273,14 @@ class NewLift(QWidget):
 
     def create_lift(self):
         lift_name = self.lift_name.text()
-        print(lift_name)
+        if lift_name is None:
+            self.error_label.setText("Enter lift name")
+            return
         created = pc.new_lift(lift_name)
         if created:
             self.existing_lifts.addItem(lift_name)
         else:
-            self.enter_lift_text.setText("Enter lift name:     Lift already exists")
+            self.error_label.setText("Enter lift name:     Lift already exists")
 
 
 class NewBlock(QWidget):
@@ -273,7 +292,7 @@ class NewBlock(QWidget):
         self.existing_blocks = QListWidget()
         self.existing_blocks.addItems(pc.get_blocks())
         self.block_type = QComboBox()
-        self.block_type.addItems(["Training", "Peaking", "Deload", "Taper"])
+        self.block_type.addItems(["Training", "Peaking", "Deload", "Taper", "Comp"])
         self.name_label = QLabel("Block Name:")
         self.block_name = QLineEdit()
         self.submit = QPushButton("Submit")

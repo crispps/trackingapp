@@ -86,3 +86,33 @@ def new_lift(lift_name) -> bool:
 def get_blocks() -> list:
     result = user.get_blocks()
     return [row["name"] for row in result]
+
+
+def check_date_format(data) -> bool:
+    from datetime import datetime
+    date_format = "%y-%m-%d"
+    try:
+        res = bool(datetime.strptime(data, date_format))
+    except ValueError:
+        res = False
+    return res
+
+
+def check_if_float(data) -> bool:
+    if data is None:
+        return False
+    try:
+        float(data)
+        return True
+    except ValueError:
+        return False
+
+
+def check_if_int(data) -> bool:
+    if data is None:
+        return False
+    try:
+        int(data)
+        return True
+    except ValueError:
+        return False
