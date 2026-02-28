@@ -218,11 +218,16 @@ class ViewLifts(QWidget):
 
         self.lift_select = QComboBox()
         self.lift_select.addItems(pc.user.get_lifts())
+        self.block_select = QComboBox()
+        self.block_select.addItem("All blocks")
+        self.block_select.addItems(pc.get_blocks())
+        self.block_select.addItems(pc.user.get_blocks())
         self.lift_history = QListWidget()
 
         # layouts
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.lift_select)
+        self.layout.addWidget(self.block_select)
         self.layout.addWidget(self.lift_history)
         self.setLayout(self.layout)
 
@@ -273,14 +278,14 @@ class NewLift(QWidget):
 
     def create_lift(self):
         lift_name = self.lift_name.text()
-        if lift_name is None:
+        if lift_name == "":
             self.error_label.setText("Enter lift name")
             return
         created = pc.new_lift(lift_name)
         if created:
             self.existing_lifts.addItem(lift_name)
         else:
-            self.error_label.setText("Enter lift name:     Lift already exists")
+            self.error_label.setText("Lift already exists")
 
 
 class NewBlock(QWidget):
