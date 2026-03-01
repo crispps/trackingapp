@@ -14,9 +14,9 @@ class Lift:
 
     def add_data(self, lift_name: str, user: str, data: dict[str, str]) -> None:
         self.data.execute("INSERT INTO lifts (blockid, userid, liftname, date, weight, sets, reps, rpe, topset) "
-                          "VALUES ((SELECT userid FROM users WHERE username = ?),(SELECT blockid FROM blocks WHERE "
-                          "name = ?) , ?, ?, ?, ?, ?, ?, ?)",
-                          (user, data["block"], lift_name, data["date"], data["weight"], data["sets"], data["reps"],
+                          "VALUES ((SELECT blockid FROM blocks WHERE "
+                          "name = ?),(SELECT userid FROM users WHERE username = ?) , ?, ?, ?, ?, ?, ?, ?)",
+                          (data["block"], user, lift_name, data["date"], data["weight"], data["sets"], data["reps"],
                            data["rpe"], data["top set"]))
 
     def dump_data(self) -> None:
@@ -48,7 +48,24 @@ class Lift:
                                     "WHERE username = ?)", (username,))
         return blocks
 
-    def get_history(self, lift: str, user: str):
-        return self.data[lift][user]
-
-
+    def get_history(self, lift: str, block: str, user: str):
+        block_row = self.data.fetchone("SELECT blockid, blocktype FROM blocks WHERE name = ?", (block,))
+        if lift == "All lifts" and block == "All blocks":
+            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
+                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                                         "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
+                                         "?)", (user,))
+        elif lift == "All lifts":
+            history = self.data.fetchall("SELECT liftname, date, weight, sets, reps, rpe FROM lifts WHERE blockid = ?",
+                                         (block_row["blockid"],))
+        elif block == "All blocks":
+            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
+                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                                         "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
+                                         "?) AND lifts.liftname = ?", (user, lift))
+        else:
+            history = self.data.fetchall("SELECT date, weight, sets, reps, rpe FROM lifts WHERE blockid = ? AND "
+                                         "userid = ?",
+                                         (block_row["blockid"], user))
+        return history
+    # DISPLAY LIFT NAME IN GUI

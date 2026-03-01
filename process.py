@@ -74,8 +74,8 @@ def submit_lift_data(data: dict[str, str]) -> None:
 
 
 # not fixed for gui
-def lift_history(lift_name) -> list:
-    lift_history = user.lift_history(lift_name)
+def lift_history(lift_name, block_name) -> list:
+    lift_history = user.lift_history(lift_name, block_name)
     return list(lift_history)
 
 

@@ -19,8 +19,8 @@ class User:
         lift_name = data.pop("lift")
         self.data.add_data(lift_name, self.username, data)
 
-    def lift_history(self, lift: str) -> list:
-        return self.data.get_history(lift, self.username)
+    def lift_history(self, lift: str, block: str) -> list:
+        return self.data.get_history(lift, block, self.username)
 
     def add_lift(self, lift: str) -> bool:
         if self.lift_exists(lift):

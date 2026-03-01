@@ -206,6 +206,7 @@ class InputLift(QWidget):
         error_message = self.check_data(lift_data)
         if len(error_message) == 0:
             pc.submit_lift_data(lift_data)
+            self.weight.clear()
         else:
             self.error_label.setText(error_message)
 
@@ -217,11 +218,11 @@ class ViewLifts(QWidget):
         # creating widgets
 
         self.lift_select = QComboBox()
+        self.lift_select.addItem("All lifts")
         self.lift_select.addItems(pc.user.get_lifts())
         self.block_select = QComboBox()
         self.block_select.addItem("All blocks")
         self.block_select.addItems(pc.get_blocks())
-        self.block_select.addItems(pc.user.get_blocks())
         self.lift_history = QListWidget()
 
         # layouts
@@ -234,10 +235,12 @@ class ViewLifts(QWidget):
         # signals
 
         self.lift_select.currentIndexChanged.connect(self.update_history)
+        self.block_select.currentIndexChanged.connect(self.update_history)
 
     def update_history(self):
         lift_name = self.lift_select.currentText()
-        history = pc.lift_history(lift_name)
+        block_name = self.block_select.currentText()
+        history = pc.lift_history(lift_name, block_name)
         self.lift_history.clear()
         for entry in history:
             self.lift_history.addItem(f"{entry['date']} - {entry['weight']}kg - "
