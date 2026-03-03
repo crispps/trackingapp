@@ -187,7 +187,7 @@ class InputLift(QWidget):
             error_message += "Sets must be an integer\n"
         if not pc.check_if_int(lift_data["reps"]):
             error_message += "Reps must be an integer\n"
-        if not pc.check_if_int(lift_data["rpe"]):
+        if not pc.check_if_float(lift_data["rpe"]):
             error_message += "RPE must be an integer\n"
         return error_message
 

@@ -11,3 +11,6 @@ def exception_hook(exc_type, exc_value, exc_tb):
 sys.excepthook = exception_hook
 
 gui.run_gui()
+
+
+# CANT INPUT IN USERNAME THEN
