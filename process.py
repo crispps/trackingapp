@@ -1,5 +1,4 @@
-import json
-import tui
+
 from user import User
 from database import Database
 
@@ -54,7 +53,6 @@ def login(username: str) -> bool:
 
 
 def add_user_to_file(username: str) -> None:
-
     db.execute("INSERT INTO users (username) VALUES (?)", (username,))
 
 
@@ -74,9 +72,9 @@ def submit_lift_data(data: dict[str, str]) -> None:
 
 
 # not fixed for gui
-def lift_history(lift_name, block_name) -> list:
+def lift_history(lift_name, block_name) -> tuple:
     lift_history = user.lift_history(lift_name, block_name)
-    return list(lift_history)
+    return lift_history
 
 
 def new_lift(lift_name) -> bool:
@@ -90,7 +88,7 @@ def get_blocks() -> list:
 
 def check_date_format(data) -> bool:
     from datetime import datetime
-    date_format = "%y-%m-%d"
+    date_format = "%Y-%m-%d"
     try:
         res = bool(datetime.strptime(data, date_format))
     except ValueError:
@@ -116,3 +114,42 @@ def check_if_int(data) -> bool:
         return True
     except ValueError:
         return False
+
+
+def format_data_by_week(data: tuple) -> list[str]:
+    print(data)
+    history = data[0]
+    display_type = data[1]
+    print(display_type)
+    weeks_range = get_week_ranges(data)
+    formatted_data = []
+    for week_num, i in enumerate(weeks_range, start=1):
+        formatted_data.append("separator")
+        formatted_data.append(f"Week {week_num}: {i[0]} - {i[1]}")
+        formatted_data.append("separator")
+        count = 0
+        dates_done = []
+        for entry in history:
+            if i[0] <= entry["date"] <= i[1]:
+                if entry["date"] not in dates_done:
+                    dates_done.append(entry["date"])
+                    count += 1
+                    formatted_data.append(f"Day {count} - {entry['date']}:")
+                formatted_data.append(f"{entry['liftname']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - "
+                                      f"@{entry['rpe']}")
+    return formatted_data
+
+
+def get_week_ranges(data: tuple) -> list[tuple]:
+    from datetime import datetime, timedelta
+    history = data[0]
+    display_type = data[1]
+    weeks_range = []
+    if display_type == "All lifts":
+        for entry in history:
+            dt = datetime.strptime(entry["date"], "%Y-%m-%d")
+            if not weeks_range or not (weeks_range[-1][0] <= entry["date"] <= weeks_range[-1][1]):
+                week_start = dt - timedelta(days=dt.weekday())
+                week_end = week_start + timedelta(days=6)
+                weeks_range.append((week_start.strftime("%Y-%m-%d"), week_end.strftime("%Y-%m-%d")))
+    return weeks_range

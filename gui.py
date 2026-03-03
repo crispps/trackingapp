@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
     QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget, QCheckBox
-from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtGui import QIcon, QFont, QFontMetrics, QTextCharFormat
 from PyQt6.QtCore import Qt
 import sys
 import process as pc
@@ -240,11 +240,33 @@ class ViewLifts(QWidget):
     def update_history(self):
         lift_name = self.lift_select.currentText()
         block_name = self.block_select.currentText()
-        history = pc.lift_history(lift_name, block_name)
+        data = pc.lift_history(lift_name, block_name)
+        history = data[0]
+        display_type = data[1]
         self.lift_history.clear()
-        for entry in history:
-            self.lift_history.addItem(f"{entry['date']} - {entry['weight']}kg - "
-                                      f"{entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+
+        fm = QFontMetrics(self.lift_history.font())
+        dash_width = fm.horizontalAdvance("-")
+        separator = "-" * (self.lift_history.width() // dash_width)
+        to_set_bold = []
+        if display_type == "All lifts":
+            display_data = pc.format_data_by_week(data)
+            for i in range(len(display_data)):
+                if display_data[i] == "separator":
+                    display_data[i] = separator
+                elif display_data[i][:3] == "Day":
+                    to_set_bold.append(i)
+        else:
+            display_data = []
+            for entry in history:
+                display_data.append(f"{entry['date']} - {entry['liftname']} - {entry['name']} - "
+                                    f"{entry['weight']}kg - "
+                                    f"{entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+        self.lift_history.addItems(display_data)
+        font = QFont()
+        font.setBold(True)
+        for i in to_set_bold:
+            self.lift_history.item(i).setFont(font)
 
 
 class DataVisualisation(QWidget):

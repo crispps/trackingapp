@@ -54,18 +54,25 @@ class Lift:
             history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
                                          "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
                                          "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                                         "?)", (user,))
+                                         "?) ORDER BY date", (user,))
+            output = (history, "All")
         elif lift == "All lifts":
-            history = self.data.fetchall("SELECT liftname, date, weight, sets, reps, rpe FROM lifts WHERE blockid = ?",
+            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
+                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                                         "WHERE lifts.blockid = ? ORDER BY date",
                                          (block_row["blockid"],))
+            output = (history, "All lifts")
         elif block == "All blocks":
             history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
                                          "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
                                          "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                                         "?) AND lifts.liftname = ?", (user, lift))
+                                         "?) AND lifts.liftname = ? ORDER BY date", (user, lift))
+            output = (history, "All blocks")
         else:
-            history = self.data.fetchall("SELECT date, weight, sets, reps, rpe FROM lifts WHERE blockid = ? AND "
-                                         "userid = ?",
-                                         (block_row["blockid"], user))
-        return history
-    # DISPLAY LIFT NAME IN GUI
+            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe FROM lifts "
+                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                                         "WHERE lifts.blockid = ? AND lifts.userid = (SELECT users.userid FROM users "
+                                         "WHERE users.username = ?) AND lifts.liftname = ? ORDER BY date",
+                                         (block_row["blockid"], user, lift))
+            output = (history, "")
+        return output

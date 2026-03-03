@@ -1,14 +1,13 @@
+import sys
+import traceback
 import gui
-from database import Database
 
-# db = Database("data/trackingapp.db")
-# db.connect()
-# result = db.fetchall("SELECT username FROM users")
-# for i in result:
-#     print(i["username"])
+
+def exception_hook(exc_type, exc_value, exc_tb):
+    traceback.print_exception(exc_type, exc_value, exc_tb)
+    sys.exit(1)
+
+
+sys.excepthook = exception_hook
 
 gui.run_gui()
-
-
-
-# GUI NEW LIFT UNIQUE CONSTRAINT ERROR
