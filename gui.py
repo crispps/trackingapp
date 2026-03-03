@@ -14,6 +14,7 @@ class LoginWindow(QMainWindow):
 
         # Setting up window
         self.w = None  # Blank variable to set up sub window to create account
+        self.create_account_window = None
         self.setFixedSize(600, 400)
         self.setWindowTitle("trackingapp")
 
@@ -75,9 +76,9 @@ class LoginWindow(QMainWindow):
             self.close()
 
     def create_account(self, ):
-        if self.w is None:
-            self.w = CreateAccount()
-        self.w.show()
+        if self.create_account_window is None:
+            self.create_account_window = CreateAccount()
+        self.create_account_window.show()
 
 
 class CreateAccount(QWidget):
@@ -223,14 +224,19 @@ class ViewLifts(QWidget):
         self.block_select = QComboBox()
         self.block_select.addItem("All blocks")
         self.block_select.addItems(pc.get_blocks())
+        self.order_by = QComboBox()
+        self.order_by.addItems(["Date", "Weight"])
         self.lift_history = QListWidget()
 
         # layouts
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.lift_select)
         self.layout.addWidget(self.block_select)
+        self.layout.addWidget(self.order_by)
         self.layout.addWidget(self.lift_history)
         self.setLayout(self.layout)
+
+        self.update_history()
 
         # signals
 
@@ -240,7 +246,8 @@ class ViewLifts(QWidget):
     def update_history(self):
         lift_name = self.lift_select.currentText()
         block_name = self.block_select.currentText()
-        data = pc.lift_history(lift_name, block_name)
+        order_by = self.order_by.currentText()
+        data = pc.get_lift_history(lift_name, block_name, order_by)
         history = data[0]
         display_type = data[1]
         self.lift_history.clear()

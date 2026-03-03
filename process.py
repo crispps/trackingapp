@@ -1,4 +1,3 @@
-
 from user import User
 from database import Database
 
@@ -25,7 +24,9 @@ def get_data_path() -> str:
 
 def get_user_list() -> list:
     print("get_user_list")
+    db.connect()
     result = db.fetchall("SELECT username FROM users")
+    db.disconnect()
     user_list = []
     for i in result:
         user_list.append(i["username"])
@@ -71,9 +72,18 @@ def submit_lift_data(data: dict[str, str]) -> None:
     user.add_data(data)
 
 
-# not fixed for gui
-def lift_history(lift_name, block_name) -> tuple:
+def bubblesort(data: list, sort_by: str) -> list:
+    for i in range(len(data)):
+        for j in range(i + 1, len(data)):
+            if data[i][sort_by] > data[j][sort_by]:
+                data[i], data[j] = data[j], data[i]
+    return data
+
+
+def get_lift_history(lift_name, block_name, order_by) -> tuple:
     lift_history = user.lift_history(lift_name, block_name)
+    # if order_by == "Weight":
+    #     lift_history = bubblesort(lift_history, "weight")
     return lift_history
 
 

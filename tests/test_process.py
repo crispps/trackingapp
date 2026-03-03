@@ -60,6 +60,6 @@ def test_create_user_sad_unit(monkeypatch):
 
 def test_get_weeks_unit():
     user = pc.login("testuser")
-    data = pc.lift_history("All lifts", "trainingtest")
+    data = pc.get_lift_history("All lifts", "trainingtest")
     ranges = pc.get_week_ranges(data)
     assert ranges == [('2026-02-02', '2026-02-08'), ('2026-02-09', '2026-02-15'), ('2026-02-16', '2026-02-22')]
