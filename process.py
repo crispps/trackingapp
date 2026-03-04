@@ -27,7 +27,10 @@ def check_username_exists(username: str) -> bool:
 
 def login(username: str) -> bool:
     global user
-    db.connect()
+    global db
+    if db is None:
+        db = Database()
+        db.connect()
     logged_in = check_username_exists(username)
     if logged_in:
         user = User(username)
