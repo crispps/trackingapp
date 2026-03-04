@@ -2,31 +2,15 @@ from user import User
 from database import Database
 
 user: object
-
-
-def get_database_path() -> str:
-    return "data/trackingapp.db"
-
-
-db = Database(get_database_path())
-db.connect()
-
-
-def get_users_path() -> str:
-    path = "data/users.json"
-    return path
-
-
-def get_data_path() -> str:
-    path = "data/lifts.json"
-    return path
+db: object = None
 
 
 def get_user_list() -> list:
-    print("get_user_list")
-    db.connect()
+    global db
+    if db is None:
+        db = Database()
+        db.connect()
     result = db.fetchall("SELECT username FROM users")
-    db.disconnect()
     user_list = []
     for i in result:
         user_list.append(i["username"])
@@ -46,7 +30,7 @@ def login(username: str) -> bool:
     db.connect()
     logged_in = check_username_exists(username)
     if logged_in:
-        user = User(username, get_database_path())
+        user = User(username)
     else:
         user = None
     db.disconnect()
@@ -54,7 +38,7 @@ def login(username: str) -> bool:
 
 
 def add_user_to_file(username: str) -> None:
-    db.execute("INSERT INTO users (username) VALUES (?)", (username,))
+    db.execute("INSERT INTO users (username) VALUES (%s)", (username,))
 
 
 def create_user(username: str) -> bool:
@@ -127,10 +111,8 @@ def check_if_int(data) -> bool:
 
 
 def format_data_by_week(data: tuple) -> list[str]:
-    print(data)
+    from datetime import date
     history = data[0]
-    display_type = data[1]
-    print(display_type)
     weeks_range = get_week_ranges(data)
     formatted_data = []
     for week_num, i in enumerate(weeks_range, start=1):
@@ -140,25 +122,27 @@ def format_data_by_week(data: tuple) -> list[str]:
         count = 0
         dates_done = []
         for entry in history:
-            if i[0] <= entry["date"] <= i[1]:
-                if entry["date"] not in dates_done:
-                    dates_done.append(entry["date"])
+            entry_date = entry["date"].strftime("%Y-%m-%d") if isinstance(entry["date"], date) else entry["date"]
+            if i[0] <= entry_date <= i[1]:
+                if entry_date not in dates_done:
+                    dates_done.append(entry_date)
                     count += 1
-                    formatted_data.append(f"Day {count} - {entry['date']}:")
+                    formatted_data.append(f"Day {count} - {entry_date}:")
                 formatted_data.append(f"{entry['liftname']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - "
                                       f"@{entry['rpe']}")
     return formatted_data
 
 
 def get_week_ranges(data: tuple) -> list[tuple]:
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, date
     history = data[0]
     display_type = data[1]
     weeks_range = []
     if display_type == "All lifts":
         for entry in history:
-            dt = datetime.strptime(entry["date"], "%Y-%m-%d")
-            if not weeks_range or not (weeks_range[-1][0] <= entry["date"] <= weeks_range[-1][1]):
+            entry_date = entry["date"].strftime("%Y-%m-%d") if isinstance(entry["date"], date) else entry["date"]
+            dt = datetime.strptime(entry_date, "%Y-%m-%d")
+            if not weeks_range or not (weeks_range[-1][0] <= entry_date <= weeks_range[-1][1]):
                 week_start = dt - timedelta(days=dt.weekday())
                 week_end = week_start + timedelta(days=6)
                 weeks_range.append((week_start.strftime("%Y-%m-%d"), week_end.strftime("%Y-%m-%d")))
