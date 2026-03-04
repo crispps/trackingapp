@@ -1,8 +1,8 @@
 class User:
-    def __init__(self, username, path: str):
+    def __init__(self, username):
         from lifts import Lift
         self.username = username
-        self.data = Lift(path)
+        self.data = Lift()
 
     def get_lifts(self) -> list:
         return self.data.get_lifts()

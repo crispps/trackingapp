@@ -1,17 +1,24 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
+
+
+def get_dsn() -> str:
+    with open("data/password.txt", "r") as f:
+        password = f.read().strip()
+    return f"postgresql://postgres.bvnzdjoabugzrbfhytsn:{password}@aws-1-eu-west-1.pooler.supabase.com:5432/postgres"
 
 
 class Database:
-    def __init__(self, db_path: str):
-        self.db_path = db_path
+    def __init__(self, db_path: str = None, dsn: str = None, **kwargs):
+
+        self.dsn = dsn or get_dsn()
+        self.kwargs = kwargs
         self.conn = None
         self.cursor = None
 
     def connect(self):
-        self.conn = sqlite3.connect(self.db_path)
-        self.conn.row_factory = sqlite3.Row  # lets you access columns by name
-        self.conn.execute("PRAGMA foreign_keys = ON")
-        self.cursor = self.conn.cursor()
+        self.conn = psycopg2.connect(self.dsn, **self.kwargs)
+        self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     def disconnect(self):
         if self.conn:
@@ -23,7 +30,8 @@ class Database:
         try:
             self.cursor.execute(query, params)
             self.conn.commit()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
+            self.conn.rollback()
             print(f"[DB ERROR] execute: {e} | query: {query} | params: {params}")
             raise
 
@@ -31,7 +39,7 @@ class Database:
         try:
             self.cursor.execute(query, params)
             return self.cursor.fetchone()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print(f"[DB ERROR] fetchone: {e} | query: {query} | params: {params}")
             raise
 
@@ -39,7 +47,7 @@ class Database:
         try:
             self.cursor.execute(query, params)
             return self.cursor.fetchall()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print(f"[DB ERROR] fetchall: {e} | query: {query} | params: {params}")
             raise
 
