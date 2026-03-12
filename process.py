@@ -34,9 +34,9 @@ def login(username: str) -> bool:
     logged_in = check_username_exists(username)
     if logged_in:
         user = User(username)
+        db.disconnect()
     else:
         user = None
-    db.disconnect()
     return logged_in
 
 

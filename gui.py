@@ -1,11 +1,77 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, \
     QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget, QCheckBox
-from PyQt6.QtGui import QIcon, QFont, QFontMetrics, QTextCharFormat
-from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QFont, QFontMetrics, QTextCharFormat, QPainter, QPen, QColor
+from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QTimer
 import sys
 import process as pc
+import threading
 
 app = QApplication([])
+
+
+class LoadingCircle(QWidget):
+    def __init__(self, parent=None, size=100, line_width=6, speed=5):
+        super().__init__(parent)
+        self.size = size
+        self.line_width = line_width
+        self.speed = speed  # degrees per frame
+        self.angle = 0
+
+        self.setFixedSize(size, size)
+
+        # Timer for animation
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.rotate)
+        self.timer.start(16)  # ~60 FPS
+
+    def rotate(self):
+        """Rotate the spinner by updating the angle."""
+        self.angle = (self.angle + self.speed) % 360
+        self.update()
+
+    def paintEvent(self, event):
+        """Draw the circular loading indicator."""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        # Background circle (faint)
+        pen_bg = QPen(QColor(200, 200, 200), self.line_width)
+        painter.setPen(pen_bg)
+        painter.drawEllipse(self.line_width, self.line_width,
+                            self.size - 2 * self.line_width,
+                            self.size - 2 * self.line_width)
+
+        # Foreground arc (rotating)
+        pen_fg = QPen(QColor(50, 150, 255), self.line_width)
+        painter.setPen(pen_fg)
+
+        start_angle = int(self.angle * 16)  # Qt uses 1/16 degree units
+        span_angle = int(120 * 16)  # arc length in degrees
+        painter.drawArc(self.line_width, self.line_width,
+                        self.size - 2 * self.line_width,
+                        self.size - 2 * self.line_width,
+                        start_angle, span_angle)
+
+
+class Worker(QObject):
+    finished = pyqtSignal()
+    success = pyqtSignal(object)  # passes return value back
+    error = pyqtSignal(str)
+
+    def __init__(self, fn, *args, **kwargs):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+            self.success.emit(result)
+        except Exception as e:
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()
 
 
 class LoginWindow(QMainWindow):
@@ -19,6 +85,9 @@ class LoginWindow(QMainWindow):
         self.setWindowTitle("trackingapp")
 
         # window.setWindowIcon(QIcon("icon.png"))
+
+        self.loading_circle = LoadingCircle(size=50, line_width=4)
+        self.loading_circle.hide()
 
         self.Titletext = QLabel("Welcome to trackingapp", self)
         self.Titletext.setFixedHeight(50)
@@ -50,9 +119,13 @@ class LoginWindow(QMainWindow):
         self.login_signup.addWidget(self.login)
         self.login_signup.addWidget(self.signup)
 
+        self.loading = QHBoxLayout()
+        self.loading.addWidget(self.username)
+        self.loading.addWidget(self.loading_circle)
+
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.Titletext)
-        self.vertical_layout.addWidget(self.username)
+        self.vertical_layout.addLayout(self.loading)
         self.vertical_layout.addLayout(self.login_signup)
 
         self.widget = QWidget()
@@ -61,19 +134,37 @@ class LoginWindow(QMainWindow):
 
         # Setting up signals
 
+        self.username.returnPressed.connect(self.login_user)
         self.login.clicked.connect(self.login_user)
         self.signup.clicked.connect(self.create_account)
 
+
+
     def login_user(self):
-        logged_in = pc.login(self.username.text())
-        print(logged_in)
-        if not logged_in:
-            self.error_label.setText("Invalid user")
-            self.error_label.show()
-        else:
-            self.w = MainWindow()
-            self.w.show()
-            self.close()
+        self.login.setEnabled(False)
+        self.loading_circle.show()
+        self.thread = QThread()
+        self.worker = Worker(pc.login, self.username.text())
+
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.worker.success.connect(lambda result: self.login_success() if result else self.login_failed())
+        self.thread.start()
+
+    def login_success(self):
+        self.w = MainWindow()
+        self.w.show()
+        self.close()
+
+    def login_failed(self):
+        self.loading_circle.hide()
+        self.login.setEnabled(True)
+        self.error_label.setText("Invalid user")
+        self.error_label.show()
+
 
     def create_account(self, ):
         if self.create_account_window is None:
