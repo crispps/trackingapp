@@ -113,8 +113,9 @@ def check_if_int(data) -> bool:
         return False
 
 
-def format_data_by_week(data: tuple) -> list[str]:
+def format_data_by_week(data: tuple) -> tuple[list[str], list[str]]:
     from datetime import date
+    id_indexes = []
     history = data[0]
     weeks_range = get_week_ranges(data)
     formatted_data = []
@@ -131,9 +132,11 @@ def format_data_by_week(data: tuple) -> list[str]:
                     dates_done.append(entry_date)
                     count += 1
                     formatted_data.append(f"Day {count} - {entry_date}:")
+                    id_indexes.append("")
                 formatted_data.append(f"{entry['liftname']} - {entry['weight']}kg - {entry['sets']}x{entry['reps']} - "
                                       f"@{entry['rpe']}")
-    return formatted_data
+                id_indexes.append(entry["liftid"])
+    return formatted_data, id_indexes
 
 
 def get_week_ranges(data: tuple) -> list[tuple]:

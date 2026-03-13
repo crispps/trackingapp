@@ -2,9 +2,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushB
     QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget, QCheckBox
 from PyQt6.QtGui import QIcon, QFont, QFontMetrics, QTextCharFormat, QPainter, QPen, QColor
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QTimer
-import sys
 import process as pc
-import threading
 
 app = QApplication([])
 
@@ -318,6 +316,8 @@ class ViewLifts(QWidget):
         self.order_by = QComboBox()
         self.order_by.addItems(["Date", "Weight"])
         self.lift_history = QListWidget()
+        self.delete_lift = QPushButton("Delete Lift")
+        self.copy_id = QPushButton("Copy ID")
 
         # layouts
         self.layout = QVBoxLayout()
@@ -325,6 +325,11 @@ class ViewLifts(QWidget):
         self.layout.addWidget(self.block_select)
         self.layout.addWidget(self.order_by)
         self.layout.addWidget(self.lift_history)
+
+        self.bottom_buttons = QHBoxLayout()
+        self.bottom_buttons.addWidget(self.delete_lift)
+        self.bottom_buttons.addWidget(self.copy_id)
+        self.layout.addLayout(self.bottom_buttons)
         self.setLayout(self.layout)
 
         self.update_history()
@@ -333,6 +338,8 @@ class ViewLifts(QWidget):
 
         self.lift_select.currentIndexChanged.connect(self.update_history)
         self.block_select.currentIndexChanged.connect(self.update_history)
+        self.copy_id.clicked.connect(self.copy_lift_id)
+        self.id_indexes = []
 
     def update_history(self):
         lift_name = self.lift_select.currentText()
@@ -343,12 +350,13 @@ class ViewLifts(QWidget):
         display_type = data[1]
         self.lift_history.clear()
 
+        self.id_indexes = []
         fm = QFontMetrics(self.lift_history.font())
         dash_width = fm.horizontalAdvance("-")
         separator = "-" * (self.lift_history.width() // dash_width)
         to_set_bold = []
         if display_type == "All lifts":
-            display_data = pc.format_data_by_week(data)
+            display_data, self.id_indexes = pc.format_data_by_week(data)
             for i in range(len(display_data)):
                 if display_data[i] == "separator":
                     display_data[i] = separator
@@ -360,12 +368,19 @@ class ViewLifts(QWidget):
                 display_data.append(f"{entry['date']} - {entry['liftname']} - {entry['name']} - "
                                     f"{entry['weight']}kg - "
                                     f"{entry['sets']}x{entry['reps']} - @{entry['rpe']}")
+                self.id_indexes.append(entry["liftid"])
         self.lift_history.addItems(display_data)
         font = QFont()
         font.setBold(True)
         for i in to_set_bold:
             self.lift_history.item(i).setFont(font)
 
+    def delete_entry(self):
+        pass
+
+    def copy_lift_id(self):
+        index = self.lift_history.currentRow()
+        print(self.id_indexes[index])
 
 class DataVisualisation(QWidget):
     def __init__(self, parent=None):
