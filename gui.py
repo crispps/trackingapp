@@ -137,7 +137,6 @@ class LoginWindow(QMainWindow):
         self.signup.clicked.connect(self.create_account)
 
 
-
     def login_user(self):
         self.login.setEnabled(False)
         self.loading_circle.show()
@@ -332,6 +331,7 @@ class ViewLifts(QWidget):
         self.layout.addLayout(self.bottom_buttons)
         self.setLayout(self.layout)
 
+        self.id_indexes = []
         self.update_history()
 
         # signals
@@ -339,7 +339,9 @@ class ViewLifts(QWidget):
         self.lift_select.currentIndexChanged.connect(self.update_history)
         self.block_select.currentIndexChanged.connect(self.update_history)
         self.copy_id.clicked.connect(self.copy_lift_id)
-        self.id_indexes = []
+        self.delete_lift.clicked.connect(self.delete_entry)
+
+        self.delete_counter = 0
 
     def update_history(self):
         lift_name = self.lift_select.currentText()
@@ -375,12 +377,28 @@ class ViewLifts(QWidget):
         for i in to_set_bold:
             self.lift_history.item(i).setFont(font)
 
+    def hide_delete_button(self):
+        self.delete_lift.setEnabled(True)
+        self.delete_lift.setStyleSheet("background-color: red; color: white;")
+
     def delete_entry(self):
-        pass
+        if self.delete_counter == 0:
+            self.delete_lift.setText("Confirm Delete")
+            self.delete_lift.setEnabled(False)
+            QTimer.singleShot(1000, self.hide_delete_button)
+            self.delete_counter += 1
+        else:
+            self.delete_counter = 0
+            self.delete_lift.setStyleSheet("background-color: white; color: black;")
+            self.delete_lift.setText("Delete lift")
+            index = self.lift_history.currentRow().__index__()
+            if self.id_indexes[index] != "":
+                pc.delete_lift_entry(self.id_indexes[index], "lifts")
 
     def copy_lift_id(self):
-        index = self.lift_history.currentRow()
-        print(self.id_indexes[index])
+        index = self.lift_history.currentRow().__index__()
+        QApplication.clipboard().setText(str(self.id_indexes[index]))
+
 
 class DataVisualisation(QWidget):
     def __init__(self, parent=None):

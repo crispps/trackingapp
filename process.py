@@ -1,3 +1,5 @@
+import string
+
 from user import User
 from database import Database
 
@@ -123,6 +125,7 @@ def format_data_by_week(data: tuple) -> tuple[list[str], list[str]]:
         formatted_data.append("separator")
         formatted_data.append(f"Week {week_num}: {i[0]} - {i[1]}")
         formatted_data.append("separator")
+        id_indexes += ["" for _ in range(3)]
         count = 0
         dates_done = []
         for entry in history:
@@ -153,3 +156,7 @@ def get_week_ranges(data: tuple) -> list[tuple]:
                 week_end = week_start + timedelta(days=6)
                 weeks_range.append((week_start.strftime("%Y-%m-%d"), week_end.strftime("%Y-%m-%d")))
     return weeks_range
+
+
+def delete_lift_entry(Pid: str, table: str) -> bool:
+    return user.delete_entry(Pid, table)

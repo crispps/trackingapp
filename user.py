@@ -30,3 +30,6 @@ class User:
 
     def create_block(self, block_type, block_name) -> bool:
         return self.data.create_block(block_type, block_name, self.username)
+
+    def delete_entry(self, Pid, table) -> bool:
+        return self.data.delete_entry(Pid, table)

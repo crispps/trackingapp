@@ -30,6 +30,7 @@ class Database:
         try:
             self.cursor.execute(query, params)
             self.conn.commit()
+            return self.cursor.rowcount
         except psycopg2.Error as e:
             self.conn.rollback()
             print(f"[DB ERROR] execute: {e} | query: {query} | params: {params}")

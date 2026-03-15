@@ -1,4 +1,3 @@
-import json
 from database import Database
 
 
@@ -45,28 +44,40 @@ class Lift:
     def get_history(self, lift: str, block: str, user: str):
         block_row = self.data.fetchone("SELECT blockid, blocktype FROM blocks WHERE name = %s", (block,))
         if lift == "All lifts" and block == "All blocks":
-            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
-                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
-                                         "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                                         "%s) ORDER BY date", (user,))
+            history = self.data.fetchall(
+                "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
+                "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
+                "%s) ORDER BY date", (user,))
             output = (history, "All")
         elif lift == "All lifts":
-            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
-                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
-                                         "WHERE lifts.blockid = %s ORDER BY date",
-                                         (block_row["blockid"],))
+            history = self.data.fetchall(
+                "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
+                "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                "WHERE lifts.blockid = %s ORDER BY date",
+                (block_row["blockid"],))
             output = (history, "All lifts")
         elif block == "All blocks":
-            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
-                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
-                                         "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                                         "%s) AND lifts.liftname = %s ORDER BY date", (user, lift))
+            history = self.data.fetchall(
+                "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
+                "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
+                "%s) AND lifts.liftname = %s ORDER BY date", (user, lift))
             output = (history, "All blocks")
         else:
-            history = self.data.fetchall("SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
-                                         "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
-                                         "WHERE lifts.blockid = %s AND lifts.userid = (SELECT users.userid FROM users "
-                                         "WHERE users.username = %s) AND lifts.liftname = %s ORDER BY date",
-                                         (block_row["blockid"], user, lift))
+            history = self.data.fetchall(
+                "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
+                "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
+                "WHERE lifts.blockid = %s AND lifts.userid = (SELECT users.userid FROM users "
+                "WHERE users.username = %s) AND lifts.liftname = %s ORDER BY date",
+                (block_row["blockid"], user, lift))
             output = (history, "")
         return output
+
+    def delete_entry(self, id: str, table: str) -> bool:
+        rows_affected = 0
+        if table == "lifts":
+            rows_affected = self.data.execute("DELETE FROM lifts WHERE liftid = %s", (id,))
+        if rows_affected == 0:
+            return False
+        return True
