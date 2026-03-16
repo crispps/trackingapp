@@ -340,6 +340,7 @@ class ViewLifts(QWidget):
         self.block_select.currentIndexChanged.connect(self.update_history)
         self.copy_id.clicked.connect(self.copy_lift_id)
         self.delete_lift.clicked.connect(self.delete_entry)
+        self.lift_history.currentRowChanged.connect(self.reset_delete_button)
 
         self.delete_counter = 0
 
@@ -381,6 +382,11 @@ class ViewLifts(QWidget):
         self.delete_lift.setEnabled(True)
         self.delete_lift.setStyleSheet("background-color: red; color: white;")
 
+    def reset_delete_button(self):
+        self.delete_counter = 0
+        self.delete_lift.setStyleSheet("background-color: white; color: black;")
+        self.delete_lift.setText("Delete lift")
+
     def delete_entry(self):
         if self.delete_counter == 0:
             self.delete_lift.setText("Confirm Delete")
@@ -394,6 +400,7 @@ class ViewLifts(QWidget):
             index = self.lift_history.currentRow().__index__()
             if self.id_indexes[index] != "":
                 pc.delete_lift_entry(self.id_indexes[index], "lifts")
+                self.update_history()
 
     def copy_lift_id(self):
         index = self.lift_history.currentRow().__index__()
