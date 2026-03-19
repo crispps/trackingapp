@@ -48,13 +48,13 @@ class Lift:
                 "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
                 "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
                 "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                "%s) ORDER BY date", (user,))
+                "%s) ORDER BY date, liftname, topset DESC", (user,))
             output = (history, "All")
         elif lift == "All lifts":
             history = self.data.fetchall(
                 "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
                 "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
-                "WHERE lifts.blockid = %s ORDER BY date",
+                "WHERE lifts.blockid = %s ORDER BY date, liftname, topset DESC",
                 (block_row["blockid"],))
             output = (history, "All lifts")
         elif block == "All blocks":
@@ -62,14 +62,14 @@ class Lift:
                 "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
                 "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
                 "WHERE lifts.userid = (SELECT users.userid FROM users WHERE users.username = "
-                "%s) AND lifts.liftname = %s ORDER BY date", (user, lift))
+                "%s) AND lifts.liftname = %s ORDER BY date, liftname, topset DESC", (user, lift))
             output = (history, "All blocks")
         else:
             history = self.data.fetchall(
                 "SELECT liftname, blocks.name, date, weight, sets, reps, rpe, liftid FROM lifts "
                 "INNER JOIN blocks ON lifts.blockid = blocks.blockid "
                 "WHERE lifts.blockid = %s AND lifts.userid = (SELECT users.userid FROM users "
-                "WHERE users.username = %s) AND lifts.liftname = %s ORDER BY date",
+                "WHERE users.username = %s) AND lifts.liftname = %s ORDER BY date, liftname, topset DESC",
                 (block_row["blockid"], user, lift))
             output = (history, "")
         return output
