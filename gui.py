@@ -316,7 +316,7 @@ class ViewLifts(QWidget):
         self.order_by.addItems(["Date", "Weight"])
         self.lift_history = QListWidget()
         self.delete_lift = QPushButton("Delete Lift")
-        self.copy_id = QPushButton("Copy ID")
+        self.copy_id = QPushButton("Copy Lifts to clipboard")
 
         # layouts
         self.layout = QVBoxLayout()
@@ -343,6 +343,7 @@ class ViewLifts(QWidget):
         self.lift_history.currentRowChanged.connect(self.reset_delete_button)
 
         self.delete_counter = 0
+        self.output_str = ""
 
     def update_history(self):
         lift_name = self.lift_select.currentText()
@@ -373,6 +374,7 @@ class ViewLifts(QWidget):
                                     f"{entry['sets']}x{entry['reps']} - @{entry['rpe']}")
                 self.id_indexes.append(entry["liftid"])
         self.lift_history.addItems(display_data)
+        self.output_str = "\n".join(display_data)
         font = QFont()
         font.setBold(True)
         for i in to_set_bold:
@@ -403,8 +405,10 @@ class ViewLifts(QWidget):
                 self.update_history()
 
     def copy_lift_id(self):
-        index = self.lift_history.currentRow().__index__()
-        QApplication.clipboard().setText(str(self.id_indexes[index]))
+        # changed to copy all of the lifts
+        # index = self.lift_history.currentRow().__index__()
+        QApplication.clipboard().setText(self.output_str)
+
 
 
 class DataVisualisation(QWidget):
