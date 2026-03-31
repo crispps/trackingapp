@@ -2,6 +2,10 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushB
     QHBoxLayout, QComboBox, QMdiSubWindow, QMdiArea, QListWidget, QCheckBox
 from PyQt6.QtGui import QIcon, QFont, QFontMetrics, QTextCharFormat, QPainter, QPen, QColor
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QTimer
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+import numpy as np
 import process as pc
 
 app = QApplication([])
@@ -136,7 +140,6 @@ class LoginWindow(QMainWindow):
         self.login.clicked.connect(self.login_user)
         self.signup.clicked.connect(self.create_account)
 
-
     def login_user(self):
         self.login.setEnabled(False)
         self.loading_circle.show()
@@ -161,7 +164,6 @@ class LoginWindow(QMainWindow):
         self.login.setEnabled(True)
         self.error_label.setText("Invalid user")
         self.error_label.show()
-
 
     def create_account(self, ):
         if self.create_account_window is None:
@@ -410,10 +412,61 @@ class ViewLifts(QWidget):
         QApplication.clipboard().setText(self.output_str)
 
 
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super().__init__(fig)
+
 
 class DataVisualisation(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.sc = MplCanvas(self, width=5, height=4, dpi=100)
+        self.sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        self.sc.axes.set_title("Example plot")
+        self.toolbar = NavigationToolbar(self.sc, self)
+
+        self.lift_select = QComboBox()
+        self.lift_select.addItems(["bench press", "squat", "deadlift"])
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.lift_select)
+        self.layout.addWidget(self.toolbar)
+        self.layout.addWidget(self.sc)
+
+        self.setLayout(self.layout)
+
+        self.show()
+
+        self.lift_select.currentIndexChanged.connect(self.update_plot)
+
+    def update_plot(self):
+        self.sc.axes.cla()
+        lift_data = pc.get_lift_history(self.lift_select.currentText(), "All blocks", "Date")
+        lift_data = [dict(row) for row in lift_data[0]]
+        weight = []
+        reps = []
+        for entry in lift_data:
+            weight.append(float(entry["weight"]))
+            reps.append(float(entry["reps"]) + (10 - float(entry["rpe"])))
+
+        model = np.poly1d(np.polyfit(weight, reps, 2))
+
+        polyline = np.linspace(min(weight), max(weight), 50)
+
+        self.sc.axes.scatter(weight, reps, color="red")
+        self.sc.axes.plot(polyline, model(polyline))
+
+        self.sc.axes.set_xlabel("Weight")
+        self.sc.axes.set_ylabel("Reps + RPE")
+        self.sc.axes.yaxis.set_inverted(True)
+        self.sc.axes.set_ylim(top=0)
+        self.sc.axes.set_title(self.lift_select.currentText() + " data")
+        print(model)
+        self.sc.draw()
 
 
 class NewLift(QWidget):
@@ -536,6 +589,8 @@ class MainWindow(QMainWindow):
             self.display = ViewLifts()
         elif option == "New block":
             self.display = NewBlock()
+        elif option == "Data visualisation":
+            self.display = DataVisualisation()
         self.layout.addWidget(self.display)
         self.display.show()
 
