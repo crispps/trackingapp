@@ -440,6 +440,7 @@ class DataVisualisation(QWidget):
         self.setLayout(self.layout)
 
         self.show()
+        self.update_plot()
 
         self.lift_select.currentIndexChanged.connect(self.update_plot)
 
